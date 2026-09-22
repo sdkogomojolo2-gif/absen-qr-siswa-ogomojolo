@@ -1,0 +1,187 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for Student entity
+    function isValidStudent(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.nis is string && data.nis.size() <= 64 &&
+             data.name is string && data.name.size() <= 200 &&
+             data.classRoom is string && data.classRoom.size() <= 64 &&
+             (data.gender == 'Laki-laki' || data.gender == 'Perempuan');
+    }
+
+    // Validation for Attendance entity
+    function isValidAttendance(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.studentId is string && data.studentId.size() <= 128 &&
+             data.studentName is string && data.studentName.size() <= 200 &&
+             data.classRoom is string && data.classRoom.size() <= 64 &&
+             data.date is string && data.date.size() <= 32 &&
+             data.time is string && data.time.size() <= 32 &&
+             (data.status == 'Hadir' || data.status == 'Terlambat' || data.status == 'Izin' || data.status == 'Sakit' || data.status == 'Alpa') &&
+             (data.scannedVia == 'QR Camera' || data.scannedVia == 'Manual Input' || data.scannedVia == 'Simulator');
+    }
+
+    // Validation for Teacher entity
+    function isValidTeacher(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() <= 200 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.subject is string && data.subject.size() <= 100 &&
+             (data.role == 'admin' || data.role == 'guru') &&
+             (data.teacherType == 'admin' || data.teacherType == 'wali_kelas' || data.teacherType == 'guru_mapel');
+    }
+
+    // Validation for SystemSettings entity
+    function isValidSettings(data) {
+      return data.lateCutoffTime is string && data.lateCutoffTime.size() <= 16 &&
+             data.schoolName is string && data.schoolName.size() <= 200 &&
+             data.schoolAddress is string && data.schoolAddress.size() <= 300 &&
+             data.academicYear is string && data.academicYear.size() <= 64;
+    }
+
+    // Validation for CloudSync payload
+    function isValidCloudSync(data) {
+      return data.syncCode is string && data.syncCode.size() <= 32 &&
+             data.lastSyncedAt is string && data.lastSyncedAt.size() <= 64 &&
+             data.schoolName is string && data.schoolName.size() <= 200;
+    }
+
+    // Validation for ScheduledLeave entity
+    function isValidScheduledLeave(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.studentId is string && data.studentId.size() <= 128 &&
+             data.studentName is string && data.studentName.size() <= 200 &&
+             data.classRoom is string && data.classRoom.size() <= 64 &&
+             data.startDate is string && data.startDate.size() <= 32 &&
+             data.endDate is string && data.endDate.size() <= 32 &&
+             (data.type == 'Izin' || data.type == 'Sakit' || data.type == 'Dispensasi');
+    }
+
+    // Validation for BehaviorLog entity
+    function isValidBehaviorLog(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.studentId is string && data.studentId.size() <= 128 &&
+             data.studentName is string && data.studentName.size() <= 200 &&
+             data.classRoom is string && data.classRoom.size() <= 64 &&
+             data.date is string && data.date.size() <= 32 &&
+             data.title is string && data.title.size() <= 200 &&
+             (data.type == 'positive' || data.type == 'negative' || data.type == 'neutral');
+    }
+
+    // Validation for ERaporRecap entity (e-Rapor Merdeka - iihh Beres)
+    function isValidERaporRecap(data) {
+      return data.nisn is string && data.nisn.size() <= 64 &&
+             data.namaSiswa is string && data.namaSiswa.size() <= 200 &&
+             data.kelas is string && data.kelas.size() <= 64 &&
+             (data.semester == 1 || data.semester == 2) &&
+             data.tahunAjaran is string && data.tahunAjaran.size() <= 64 &&
+             data.kehadiran is map &&
+             data.kehadiran.sakit is number && data.kehadiran.sakit >= 0 &&
+             data.kehadiran.izin is number && data.kehadiran.izin >= 0 &&
+             data.kehadiran.tanpaKeterangan is number && data.kehadiran.tanpaKeterangan >= 0 &&
+             (!('sakit' in data) || (data.sakit is number && data.sakit >= 0)) &&
+             (!('izin' in data) || (data.izin is number && data.izin >= 0)) &&
+             (!('tanpaKeterangan' in data) || (data.tanpaKeterangan is number && data.tanpaKeterangan >= 0)) &&
+             (!('tanggalMulai' in data) || data.tanggalMulai is string) &&
+             (!('tanggalSelesai' in data) || data.tanggalSelesai is string) &&
+             (!('tipePeriode' in data) || data.tipePeriode is string) &&
+             (!('periodeLabel' in data) || data.periodeLabel is string) &&
+             (!('bulan' in data) || data.bulan is string) &&
+             data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    // Students Collection
+    match /students/{studentId} {
+      allow read: if true;
+      allow create, update: if isValidId(studentId);
+      allow delete: if isValidId(studentId);
+    }
+
+    // Data Siswa Collections (alias used in e-Rapor / iihh Beres)
+    match /data_siswa/{studentId} {
+      allow read, write: if isValidId(studentId);
+    }
+
+    match /siswa/{studentId} {
+      allow read, write: if isValidId(studentId);
+    }
+
+    // Attendance Collection
+    match /attendance/{recordId} {
+      allow read: if true;
+      allow create: if isValidId(recordId) && isValidAttendance(incoming());
+      allow update: if isValidId(recordId) && isValidAttendance(incoming()) && incoming().id == existing().id;
+      allow delete: if isValidId(recordId);
+    }
+
+    // Teachers Collection
+    match /teachers/{teacherId} {
+      allow read: if true;
+      allow create: if isValidId(teacherId) && isValidTeacher(incoming());
+      allow update: if isValidId(teacherId) && isValidTeacher(incoming()) && incoming().id == existing().id;
+      allow delete: if isValidId(teacherId);
+    }
+
+    // Settings Collection
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, update: if isValidId(settingId) && isValidSettings(incoming());
+      allow delete: if false;
+    }
+
+    // Cloud Sync Collection
+    match /cloud_sync/{syncCode} {
+      allow read: if true;
+      allow create, update: if isValidId(syncCode) && isValidCloudSync(incoming());
+      allow delete: if isValidId(syncCode);
+    }
+
+    // Scheduled Leaves Collection (Izin / Sakit multi-hari)
+    match /leaves/{leaveId} {
+      allow read: if true;
+      allow create: if isValidId(leaveId) && isValidScheduledLeave(incoming());
+      allow update: if isValidId(leaveId) && isValidScheduledLeave(incoming()) && incoming().id == existing().id;
+      allow delete: if isValidId(leaveId);
+    }
+
+    // Student Behavior Logs Collection (Catatan Karakter, Kebaikan & Pelanggaran)
+    match /behavior_logs/{logId} {
+      allow read: if true;
+      allow create: if isValidId(logId) && isValidBehaviorLog(incoming());
+      allow update: if isValidId(logId) && isValidBehaviorLog(incoming()) && incoming().id == existing().id;
+      allow delete: if isValidId(logId);
+    }
+
+    // e-Rapor Merdeka Semester Recap Collection (iihh Beres)
+    match /rekap_absensi_ogomojolo/{recapId} {
+      allow read: if true;
+      allow create, update: if isValidId(recapId) && isValidERaporRecap(incoming());
+      allow delete: if isValidId(recapId);
+    }
+
+    // Test connection doc
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

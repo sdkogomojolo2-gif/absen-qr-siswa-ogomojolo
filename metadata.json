@@ -1,0 +1,10 @@
+{
+  "name": "Remix ABSENSI OGOMOJOLO",
+  "description": "Sistem Absensi QR Code SD dengan Deteksi Otomatis Siswa Alpha & WA Ortu, Izin/Sakit Terjadwal & Bukti Surat Dokter, Jurnal Karakter Siswa, serta Ekspor Rekap Lengkap",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

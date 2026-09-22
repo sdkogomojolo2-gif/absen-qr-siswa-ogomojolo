@@ -1,0 +1,272 @@
+@import "tailwindcss";
+
+@layer components {
+  .bento-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .dark .bento-card {
+    background-color: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .bento-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .bento-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .dark .stat-label {
+    color: #94a3b8;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
+    color: #1e293b;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .dark .stat-value {
+    color: #f8fafc;
+  }
+
+  .btn-indigo {
+    background-color: #4f46e5;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-indigo:hover {
+    background-color: #4338ca;
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .status-present {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+  }
+
+  .dark .status-present {
+    background-color: #064e3b;
+    color: #6ee7b7;
+    border-color: #047857;
+  }
+
+  .status-late {
+    background-color: #fef9c3;
+    color: #854d0e;
+    border: 1px solid #fef08a;
+  }
+
+  .dark .status-late {
+    background-color: #713f12;
+    color: #fde047;
+    border-color: #a16207;
+  }
+
+  .status-absent {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+  }
+
+  .dark .status-absent {
+    background-color: #7f1d1d;
+    color: #fca5a5;
+    border-color: #b91c1c;
+  }
+
+  .qr-scanner-viewport {
+    background-color: #0f172a;
+    border-radius: 1rem;
+    height: 320px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scan-line {
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background: #10b981;
+    top: 0;
+    animation: scan 3s linear infinite;
+    box-shadow: 0 0 15px #10b981, 0 0 5px #10b981;
+    z-index: 10;
+    pointer-events: none;
+  }
+}
+
+@keyframes scan {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+/* Global Dark Mode Overrides (Rich Maroon Red Palette) */
+.dark body {
+  background-color: #220204;
+  color: #fce7e7;
+}
+
+.dark input, 
+.dark select, 
+.dark textarea {
+  background-color: #2c0407 !important;
+  color: #fdf2f2 !important;
+  border-color: #5c0d14 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #fda4af !important;
+}
+
+.dark .bg-white {
+  background-color: #340408 !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: #250305 !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #380509 !important;
+}
+
+.dark .bg-slate-800 {
+  background-color: #3a060a !important;
+}
+
+.dark .bg-slate-900 {
+  background-color: #270305 !important;
+}
+
+.dark .text-slate-900 {
+  color: #ffffff !important;
+}
+
+.dark .text-slate-800 {
+  color: #fce7e7 !important;
+}
+
+.dark .text-slate-700 {
+  color: #fecdd3 !important;
+}
+
+.dark .text-slate-600 {
+  color: #fda4af !important;
+}
+
+.dark .text-slate-500 {
+  color: #f43f5e !important;
+}
+
+.dark .border-slate-100,
+.dark .border-slate-200 {
+  border-color: #540c12 !important;
+}
+
+.dark .border-slate-300 {
+  border-color: #6b101b !important;
+}
+
+.dark .border-slate-700,
+.dark .border-slate-800 {
+  border-color: #540c12 !important;
+}
+
+.dark .hover\:bg-slate-50:hover {
+  background-color: #4a070e !important;
+}
+
+.dark .hover\:bg-slate-100:hover {
+  background-color: #4a070e !important;
+}
+
+.dark .hover\:bg-slate-200:hover {
+  background-color: #5c0d15 !important;
+}
+
+/* Custom Scrollbar - Maroon Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #3b060a;
+}
+::-webkit-scrollbar-thumb {
+  background: #73121e;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #941727;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1c0204;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #5c0d15;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #7a121d;
+}
+
+/* Print Stylesheet for Student Card */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    border: 2px solid #000 !important;
+  }
+}
+

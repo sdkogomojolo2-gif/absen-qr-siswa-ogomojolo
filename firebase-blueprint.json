@@ -1,0 +1,191 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Data identitas siswa sekolah dasar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "ID unik siswa" },
+        "nis": { "type": "string", "description": "Nomor Induk Siswa" },
+        "name": { "type": "string", "description": "Nama lengkap siswa" },
+        "classRoom": { "type": "string", "description": "Kelas siswa (misal Kelas 1, 1-A)" },
+        "gender": { "type": "string", "enum": ["Laki-laki", "Perempuan"], "description": "Jenis kelamin" },
+        "parentPhone": { "type": "string", "description": "Nomor WhatsApp orang tua" },
+        "avatarUrl": { "type": "string", "description": "URL avatar siswa" },
+        "photo": { "type": "string", "description": "Foto profil siswa" },
+        "createdAt": { "type": "string", "description": "Waktu pembuatan data" }
+      },
+      "required": ["id", "nis", "name", "classRoom", "gender"]
+    },
+    "AttendanceRecord": {
+      "title": "AttendanceRecord",
+      "description": "Catatan absensi harian siswa",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "ID unik absensi" },
+        "studentId": { "type": "string", "description": "ID referensi siswa" },
+        "nis": { "type": "string", "description": "NIS siswa" },
+        "studentName": { "type": "string", "description": "Nama siswa" },
+        "classRoom": { "type": "string", "description": "Kelas siswa" },
+        "date": { "type": "string", "description": "Tanggal absensi YYYY-MM-DD" },
+        "time": { "type": "string", "description": "Waktu absensi HH:mm:ss" },
+        "status": { "type": "string", "enum": ["Hadir", "Terlambat", "Izin", "Sakit", "Alpa"], "description": "Status kehadiran" },
+        "note": { "type": "string", "description": "Catatan keterangan absensi" },
+        "scannedVia": { "type": "string", "enum": ["QR Camera", "Manual Input", "Simulator"], "description": "Metode pencatatan" }
+      },
+      "required": ["id", "studentId", "nis", "studentName", "classRoom", "date", "time", "status", "scannedVia"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Data guru dan pengelola absensi sekolah",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "ID guru" },
+        "name": { "type": "string", "description": "Nama guru" },
+        "email": { "type": "string", "description": "Email guru" },
+        "nip": { "type": "string", "description": "NIP guru" },
+        "subject": { "type": "string", "description": "Mata pelajaran" },
+        "role": { "type": "string", "enum": ["admin", "guru"], "description": "Role level" },
+        "teacherType": { "type": "string", "enum": ["admin", "wali_kelas", "guru_mapel"], "description": "Tipe tugas guru" },
+        "homeroomClass": { "type": "string", "description": "Kelas binaan jika wali kelas" }
+      },
+      "required": ["id", "name", "email", "subject", "role", "teacherType"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "Pengaturan sekolah dan jam absensi",
+      "type": "object",
+      "properties": {
+        "lateCutoffTime": { "type": "string", "description": "Batas jam masuk (HH:mm)" },
+        "schoolName": { "type": "string", "description": "Nama sekolah" },
+        "schoolAddress": { "type": "string", "description": "Alamat sekolah" },
+        "academicYear": { "type": "string", "description": "Tahun ajaran" },
+        "headmasterName": { "type": "string", "description": "Nama kepala sekolah" },
+        "headmasterNip": { "type": "string", "description": "NIP kepala sekolah" },
+        "schoolCity": { "type": "string", "description": "Kota sekolah" }
+      },
+      "required": ["lateCutoffTime", "schoolName", "schoolAddress", "academicYear"]
+    },
+    "CloudSync": {
+      "title": "CloudSync",
+      "description": "Snapshot data untuk backup dan sync lintas perangkat",
+      "type": "object",
+      "properties": {
+        "syncCode": { "type": "string", "description": "Kode sinkronisasi unik" },
+        "lastSyncedAt": { "type": "string", "description": "Waktu sinkronisasi" },
+        "schoolName": { "type": "string", "description": "Nama sekolah" },
+        "students": { "type": "array", "description": "Daftar siswa" },
+        "attendanceRecords": { "type": "array", "description": "Daftar absensi" },
+        "settings": { "type": "object", "description": "Pengaturan sistem" },
+        "teachers": { "type": "array", "description": "Daftar guru" }
+      },
+      "required": ["syncCode", "lastSyncedAt", "schoolName"]
+    },
+    "ScheduledLeave": {
+      "title": "ScheduledLeave",
+      "description": "Data permohonan izin dan sakit berjangka serta surat bukti",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "ID permohonan izin" },
+        "studentId": { "type": "string", "description": "ID siswa" },
+        "nis": { "type": "string", "description": "NIS siswa" },
+        "studentName": { "type": "string", "description": "Nama siswa" },
+        "classRoom": { "type": "string", "description": "Kelas siswa" },
+        "type": { "type": "string", "enum": ["Izin", "Sakit", "Dispensasi"], "description": "Tipe izin" },
+        "startDate": { "type": "string", "description": "Tanggal mulai YYYY-MM-DD" },
+        "endDate": { "type": "string", "description": "Tanggal selesai YYYY-MM-DD" },
+        "reason": { "type": "string", "description": "Alasan izin / sakit" },
+        "attachmentPhoto": { "type": "string", "description": "Foto surat dokter / surat izin" },
+        "createdAt": { "type": "string", "description": "Waktu dibuat" },
+        "recordedBy": { "type": "string", "description": "Pencatat izin" },
+        "status": { "type": "string", "enum": ["Aktif", "Selesai", "Dibatalkan"], "description": "Status izin" }
+      },
+      "required": ["id", "studentId", "studentName", "classRoom", "type", "startDate", "endDate"]
+    },
+    "BehaviorLog": {
+      "title": "BehaviorLog",
+      "description": "Jurnal catatan perkembangan kedisiplinan dan poin kebaikan siswa",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "ID catatan karakter" },
+        "studentId": { "type": "string", "description": "ID siswa" },
+        "nis": { "type": "string", "description": "NIS siswa" },
+        "studentName": { "type": "string", "description": "Nama siswa" },
+        "classRoom": { "type": "string", "description": "Kelas siswa" },
+        "date": { "type": "string", "description": "Tanggal pencatatan YYYY-MM-DD" },
+        "type": { "type": "string", "enum": ["positive", "negative", "neutral"], "description": "Jenis catatan" },
+        "category": { "type": "string", "description": "Kategori kedisiplinan / prestasi" },
+        "title": { "type": "string", "description": "Judul poin / pelanggaran" },
+        "points": { "type": "number", "description": "Bobot nilai poin (+/-)" },
+        "description": { "type": "string", "description": "Deskripsi detail catatan" },
+        "recordedBy": { "type": "string", "description": "Nama guru pelapor" },
+        "createdAt": { "type": "string", "description": "Waktu dibuat" }
+      },
+      "required": ["id", "studentId", "studentName", "classRoom", "date", "type", "title", "points"]
+    },
+    "ERaporRecap": {
+      "title": "ERaporRecap",
+      "description": "Rekap kehadiran semesteran siswa untuk integrasi aplikasi e-Rapor Merdeka (iihh Beres)",
+      "type": "object",
+      "properties": {
+        "nisn": { "type": "string", "description": "NISN siswa 10 digit" },
+        "namaSiswa": { "type": "string", "description": "Nama lengkap murid" },
+        "kelas": { "type": "string", "description": "Tingkat kelas siswa (contoh: Kelas 4)" },
+        "semester": { "type": "number", "enum": [1, 2], "description": "Semester 1 (Ganjil) atau 2 (Genap)" },
+        "tahunAjaran": { "type": "string", "description": "Tahun ajaran akademik (contoh: 2024/2025)" },
+        "sakit": { "type": "number", "description": "Total sakit sepanjang semester" },
+        "izin": { "type": "number", "description": "Total izin sepanjang semester" },
+        "tanpaKeterangan": { "type": "number", "description": "Total tanpa keterangan (alpa) sepanjang semester" },
+        "kehadiran": {
+          "type": "object",
+          "description": "Total kehadiran semester (sakit, izin, tanpaKeterangan)"
+        },
+        "tipePeriode": { "type": "string", "description": "Tipe periode rekap (semester, bulanan, rentang_tanggal)" },
+        "periodeLabel": { "type": "string", "description": "Label periode tanggal absensi" },
+        "tanggalMulai": { "type": "string", "description": "Tanggal awal rentang absensi (YYYY-MM-DD)" },
+        "tanggalSelesai": { "type": "string", "description": "Tanggal akhir rentang absensi (YYYY-MM-DD)" },
+        "bulan": { "type": "string", "description": "Bulan rekap jika bulanan (YYYY-MM)" },
+        "updatedAt": { "type": "string", "description": "Waktu pembaruan ISO 8601 timestamp" }
+      },
+      "required": ["nisn", "namaSiswa", "kelas", "semester", "tahunAjaran", "kehadiran", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Koleksi data seluruh siswa sekolah dasar"
+    },
+    "/data_siswa/{studentId}": {
+      "schema": "Student",
+      "description": "Koleksi data siswa untuk integrasi e-Rapor Merdeka (iihh Beres)"
+    },
+    "/attendance/{recordId}": {
+      "schema": "AttendanceRecord",
+      "description": "Koleksi rekaman presensi harian siswa"
+    },
+    "/teachers/{teacherId}": {
+      "schema": "Teacher",
+      "description": "Koleksi akun guru dan wali kelas"
+    },
+    "/settings/{settingId}": {
+      "schema": "SystemSettings",
+      "description": "Konfigurasi instansi sekolah dan batas keterlambatan"
+    },
+    "/cloud_sync/{syncCode}": {
+      "schema": "CloudSync",
+      "description": "Koleksi backup cadangan cloud"
+    },
+    "/leaves/{leaveId}": {
+      "schema": "ScheduledLeave",
+      "description": "Koleksi perizinan sakit dan izin multi-hari siswa"
+    },
+    "/behavior_logs/{logId}": {
+      "schema": "BehaviorLog",
+      "description": "Koleksi buku catatan pelanggaran dan poin kebaikan siswa"
+    },
+    "/rekap_absensi_ogomojolo/{recapId}": {
+      "schema": "ERaporRecap",
+      "description": "Koleksi sinkronisasi rekap absensi semester siswa ke aplikasi e-Rapor Merdeka (iihh Beres)"
+    }
+  }
+}
