@@ -288,13 +288,27 @@ export async function saveSettingsToFirestore(settings: SystemSettings): Promise
 }
 
 /**
- * Cloud Sync Snapshots to Firestore
+ * Cloud Sync Snapshots to Firestore (Safe for Firestore 1MB document limit)
  */
 export async function saveCloudSyncToFirestore(payload: CloudSyncPayload): Promise<void> {
   const cleanCode = payload.syncCode.trim().toUpperCase();
   const path = `${COLLECTIONS.CLOUD_SYNC}/${cleanCode}`;
   try {
-    await setDoc(doc(db, COLLECTIONS.CLOUD_SYNC, cleanCode), sanitizeForFirestore(payload));
+    // Strip large base64 strings from single snapshot document to stay well under 1MB Firestore limit
+    const lightweightStudents = (payload.students || []).map((std) => {
+      const c = { ...std };
+      if (typeof c.photo === 'string' && c.photo.length > 1500) {
+        c.photo = '';
+      }
+      return c;
+    });
+
+    const safePayload: CloudSyncPayload = {
+      ...payload,
+      students: lightweightStudents,
+    };
+
+    await setDoc(doc(db, COLLECTIONS.CLOUD_SYNC, cleanCode), sanitizeForFirestore(safePayload));
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }
@@ -323,7 +337,50 @@ export async function fetchCloudSyncFromFirestore(syncCode: string): Promise<Clo
     });
     return found;
   } catch (error) {
-    handleFirestoreError(error, OperationType.GET, path);
+    console.warn('Firestore Operation Notice (fetchCloudSync):', error);
+    return null;
+  }
+}
+
+/**
+ * Direct recovery of all school collections directly from Firestore
+ */
+export async function fetchDatabaseDirectlyFromFirestore(): Promise<{
+  students: Student[];
+  attendanceRecords: AttendanceRecord[];
+  settings?: SystemSettings;
+  teachers: Teacher[];
+} | null> {
+  try {
+    const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+    const attendanceSnap = await getDocs(collection(db, COLLECTIONS.ATTENDANCE));
+    const teachersSnap = await getDocs(collection(db, COLLECTIONS.TEACHERS));
+    const settingsDoc = await getDoc(doc(db, COLLECTIONS.SETTINGS, 'school'));
+
+    const students: Student[] = [];
+    studentsSnap.forEach((d) => students.push(d.data() as Student));
+
+    const attendanceRecords: AttendanceRecord[] = [];
+    attendanceSnap.forEach((d) => attendanceRecords.push(d.data() as AttendanceRecord));
+
+    const teachers: Teacher[] = [];
+    teachersSnap.forEach((d) => teachers.push(d.data() as Teacher));
+
+    const settings = settingsDoc.exists() ? (settingsDoc.data() as SystemSettings) : undefined;
+
+    if (students.length === 0 && attendanceRecords.length === 0) {
+      return null;
+    }
+
+    return {
+      students,
+      attendanceRecords,
+      settings,
+      teachers,
+    };
+  } catch (err) {
+    console.warn('Direct fetch from Firestore failed:', err);
+    return null;
   }
 }
 
