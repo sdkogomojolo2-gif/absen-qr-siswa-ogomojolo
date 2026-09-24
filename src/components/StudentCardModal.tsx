@@ -323,6 +323,14 @@ export const StudentCardModal: React.FC<StudentCardModalProps> = ({
                 padding: 0;
                 background: white !important;
               }
+              #single-cr80-card-printable .cr80-card {
+                width: 430px !important;
+                height: 272px !important;
+                transform: scale(0.752) !important;
+                transform-origin: center center !important;
+                border: 0.5px solid #cbd5e1 !important;
+                box-shadow: none !important;
+              }
               .no-print {
                 display: none !important;
               }

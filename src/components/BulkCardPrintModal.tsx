@@ -605,10 +605,13 @@ export const BulkCardPrintModal: React.FC<BulkCardPrintModalProps> = ({
                     break-inside: avoid;
                     width: 85.6mm !important;
                     height: 53.98mm !important;
+                    overflow: hidden;
                   }
                   .card-item .cr80-card {
-                    width: 85.6mm !important;
-                    height: 53.98mm !important;
+                    width: 430px !important;
+                    height: 272px !important;
+                    transform: scale(0.752) !important;
+                    transform-origin: top left !important;
                     border: 0.5px solid #cbd5e1 !important;
                     box-shadow: none !important;
                   }

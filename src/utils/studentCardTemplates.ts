@@ -382,39 +382,40 @@ export const drawCR80CardPDF = (
 
   // Kop Center Text
   const kopCenterX = x + cardWidth / 2;
-  const kopMaxWidth = cardWidth - 24;
+  const kopMaxWidth = cardWidth - 22;
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(3.8);
+  doc.setFontSize(4.6);
   doc.setTextColor(71, 85, 105);
-  doc.text(departmentText, kopCenterX, y + 5.0, { align: 'center', maxWidth: kopMaxWidth });
+  doc.text(departmentText, kopCenterX, y + 4.9, { align: 'center', maxWidth: kopMaxWidth });
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(5.8);
+  doc.setFontSize(7.6);
   doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
   doc.text(schoolName, kopCenterX, y + 7.8, { align: 'center', maxWidth: kopMaxWidth });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(3.0);
+  doc.setFontSize(3.8);
   doc.setTextColor(100, 116, 139);
   doc.text(schoolAddress, kopCenterX, y + 10.2, { align: 'center', maxWidth: kopMaxWidth });
 
   // Garis KOP Ganda
   doc.setDrawColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
   doc.setLineWidth(0.35);
-  doc.line(x + 2.5, y + 12.2, x + cardWidth - 2.5, y + 12.2);
+  doc.line(x + 2.5, y + 12.0, x + cardWidth - 2.5, y + 12.0);
 
   doc.setDrawColor(accentRGB[0], accentRGB[1], accentRGB[2]);
   doc.setLineWidth(0.18);
-  doc.line(x + 2.5, y + 12.8, x + cardWidth - 2.5, y + 12.8);
+  doc.line(x + 2.5, y + 12.6, x + cardWidth - 2.5, y + 12.6);
 
   // 3. BANNER JUDUL KARTU RESMI
-  const titleY = y + 13.5;
+  const titleY = y + 13.3;
+  const titleH = 3.6;
   doc.setFillColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
-  doc.roundedRect(x + 2.5, titleY, cardWidth - 5, 3.4, 0.8, 0.8, 'F');
+  doc.roundedRect(x + 2.5, titleY, cardWidth - 5, titleH, 0.8, 0.8, 'F');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(4.3);
+  doc.setFontSize(5.0);
   doc.setTextColor(255, 255, 255);
   const cardTitle =
     templateId === 'seraphic'
@@ -422,18 +423,21 @@ export const drawCR80CardPDF = (
       : templateId === 'nusantara'
       ? 'KARTU IDENTITAS & PRESENSI DIGITAL SISWA'
       : 'SMART STUDENT CARD & DIGITAL PRESENCE';
-  doc.text(cardTitle, x + 4.0, titleY + 2.4);
+  doc.text(cardTitle, x + 4.0, titleY + 2.5);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(3.5);
+  doc.setFontSize(4.4);
   doc.setTextColor(accentRGB[0], accentRGB[1], accentRGB[2]);
-  doc.text(`TA ${academicYear}`, x + cardWidth - 4.5, titleY + 2.4, { align: 'right' });
+  doc.text(`TA ${academicYear}`, x + cardWidth - 4.5, titleY + 2.5, { align: 'right' });
+
+  // Body Vertical Origin
+  const bodyY = titleY + titleH + 1.2;
 
   // 4. COLUMN 1 (LEFT): PASFOTO FORMAL 3x4 DENGAN STEMPEL & BADGE NIS
-  const photoW = 15.5;
-  const photoH = 20.0;
-  const photoX = x + 3.2;
-  const photoY = titleY + 4.6;
+  const photoW = 16.0;
+  const photoH = 20.5;
+  const photoX = x + 3.0;
+  const photoY = bodyY;
 
   // Frame Foto
   doc.setFillColor(248, 250, 252);
@@ -453,46 +457,78 @@ export const drawCR80CardPDF = (
     doc.rect(photoX + 0.3, photoY + 0.3, photoW - 0.6, photoH - 0.6, 'F');
     doc.setTextColor(148, 163, 184);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(3.2);
+    doc.setFontSize(3.6);
     doc.text('FOTO 3X4', photoX + photoW / 2, photoY + photoH / 2, { align: 'center' });
   }
 
   // Stempel Basah Sekolah (Menimpa pojok kanan bawah foto)
-  const stampX = photoX + photoW - 1.5;
-  const stampY = photoY + photoH - 1.5;
+  const stampX = photoX + photoW - 1.8;
+  const stampY = photoY + photoH - 1.8;
   doc.setDrawColor(67, 56, 202); // Ungu Stempel
   doc.setLineWidth(0.25);
-  doc.circle(stampX, stampY, 3.8, 'S');
+  doc.circle(stampX, stampY, 4.0, 'S');
   doc.setLineWidth(0.12);
-  doc.circle(stampX, stampY, 3.2, 'S');
+  doc.circle(stampX, stampY, 3.4, 'S');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(1.7);
+  doc.setFontSize(2.2);
   doc.setTextColor(67, 56, 202);
-  doc.text('RESMI', stampX, stampY + 0.6, { align: 'center' });
+  doc.text('RESMI', stampX, stampY + 0.8, { align: 'center' });
 
   // Badge NIS & Status di Bawah Foto
+  const badgeY = photoY + photoH + 1.0;
+  const badgeH = 5.2;
   doc.setFillColor(241, 245, 249);
   doc.setDrawColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
-  doc.setLineWidth(0.2);
-  doc.roundedRect(photoX, photoY + photoH + 1.2, photoW, 4.0, 0.8, 0.8, 'FD');
+  doc.setLineWidth(0.25);
+  doc.roundedRect(photoX, badgeY, photoW, badgeH, 0.8, 0.8, 'FD');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(3.0);
+  doc.setFontSize(4.5);
   doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
-  doc.text(`NIS: ${studentNis}`, photoX + photoW / 2, photoY + photoH + 2.8, { align: 'center' });
+  doc.text(`NIS: ${studentNis}`, photoX + photoW / 2, badgeY + 2.5, { align: 'center' });
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(2.3);
-  doc.setTextColor(71, 85, 105);
-  doc.text('SISWA AKTIF', photoX + photoW / 2, photoY + photoH + 4.5, { align: 'center' });
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(3.6);
+  doc.setTextColor(21, 128, 61); // Emerald 700
+  doc.text('SISWA AKTIF', photoX + photoW / 2, badgeY + 4.4, { align: 'center' });
+
+  // 6. COLUMN 3 (RIGHT): LARGE SCANNABLE QR CODE & SCAN BADGE (24.5 x 24.5 mm)
+  const qrSize = 22.5;
+  const qrBoxPadding = 1.0;
+  const qrBoxW = qrSize + 2 * qrBoxPadding; // 24.5 mm
+  const qrBoxX = x + cardWidth - qrBoxW - 3.0; // x + 58.1 mm
+  const qrBoxY = bodyY;
+
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+  doc.setLineWidth(0.35);
+  doc.roundedRect(qrBoxX, qrBoxY, qrBoxW, qrBoxW, 1.2, 1.2, 'FD');
+
+  if (qrDataUrl) {
+    try {
+      doc.addImage(qrDataUrl, 'PNG', qrBoxX + qrBoxPadding, qrBoxY + qrBoxPadding, qrSize, qrSize);
+    } catch {
+      doc.rect(qrBoxX + qrBoxPadding, qrBoxY + qrBoxPadding, qrSize, qrSize);
+    }
+  }
+
+  // Badge PINDAI ABSENSI di Bawah QR Code
+  const badgeScanY = qrBoxY + qrBoxW + 1.2;
+  doc.setFillColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+  doc.roundedRect(qrBoxX, badgeScanY, qrBoxW, 3.8, 0.8, 0.8, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(4.6);
+  doc.setTextColor(255, 255, 255);
+  doc.text('PINDAI ABSENSI', qrBoxX + qrBoxW / 2, badgeScanY + 2.6, { align: 'center' });
 
   // 5. COLUMN 2 (CENTER): TABEL BIODATA SISWA & PENGESAHAN KEPALA SEKOLAH
-  const tableX = x + 21.0;
-  const colColonX = tableX + 11.5;
-  const colValX = tableX + 13.0;
-  const maxValW = 28.0;
-  let curY = photoY + 2.2;
-  const rowGap = 2.4;
+  const tableX = x + 20.8;
+  const colColonX = tableX + 11.0;
+  const colValX = tableX + 12.2;
+  const maxValW = 24.5;
+  let curY = bodyY + 2.0;
+  const rowGap = 2.45;
 
   const rows = [
     { label: 'NIS/NISN', val: `${studentNis} / ${studentNisn}` },
@@ -505,27 +541,30 @@ export const drawCR80CardPDF = (
   ];
 
   rows.forEach((row, idx) => {
+    // Label
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(3.0);
+    doc.setFontSize(4.4);
     doc.setTextColor(71, 85, 105);
     doc.text(row.label, tableX, curY);
 
+    // Titik dua
     doc.setTextColor(148, 163, 184);
     doc.text(':', colColonX, curY);
 
+    // Value
     if (idx === 1) {
-      // Nama: Bold & dark
+      // Nama Siswa: Tebal, besar, jelas
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(3.5);
+      doc.setFontSize(5.5);
       doc.setTextColor(15, 23, 42);
     } else if (idx === 0 || idx === 5) {
-      // NIS / Kelas: Bold primary color
+      // NISN / Kelas: Tebal warna tema
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(3.1);
+      doc.setFontSize(4.6);
       doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
     } else {
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(2.9);
+      doc.setFontSize(4.3);
       doc.setTextColor(30, 41, 59);
     }
     doc.text(row.val, colValX, curY, { maxWidth: maxValW });
@@ -533,23 +572,47 @@ export const drawCR80CardPDF = (
     curY += rowGap;
   });
 
-  // Pengesahan Kepala Sekolah di Bawah Biodata
-  const signY = curY + 1.2;
+  // Pengesahan Kepala Sekolah di Bawah Biodata (Side-by-side: Teks di Kiri, Barcode TTE Kotak di Kanan)
+  const signDividerY = bodyY + 18.0;
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.2);
+  doc.line(tableX, signDividerY, qrBoxX - 1.5, signDividerY);
+
+  // Kiri: Teks Pengesahan
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(2.7);
+  doc.setFontSize(3.6);
   doc.setTextColor(100, 116, 139);
-  doc.text(cityDateText, tableX, signY);
+  doc.text(cityDateText, tableX, signDividerY + 2.2);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(2.9);
+  doc.setFontSize(4.1);
   doc.setTextColor(15, 23, 42);
-  doc.text('Kepala Sekolah,', tableX, signY + 2.8);
+  doc.text('Kepala Sekolah,', tableX, signDividerY + 4.2);
 
-  // Tanda Tangan / Barcode TTE Kepala Sekolah
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(4.6);
+  doc.setTextColor(15, 23, 42);
+  doc.text(headmaster, tableX, signDividerY + 7.6, { maxWidth: 26.5 });
+  // Underline nama kepala sekolah
+  const nameWidth = Math.min(doc.getTextWidth(headmaster), 26.5);
+  doc.setDrawColor(15, 23, 42);
+  doc.setLineWidth(0.2);
+  doc.line(tableX, signDividerY + 7.9, tableX + nameWidth, signDividerY + 7.9);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(3.5);
+  doc.setTextColor(71, 85, 105);
+  doc.text(headmasterNip, tableX, signDividerY + 9.8, { maxWidth: 26.5 });
+
+  // Kanan: Barcode / QR TTE Kepala Sekolah (SQUARE 1:1, Rapi, Tidak Berantakan / Terdistorsi)
   const headmasterSignImg =
     cardAssets?.headmasterSignPng ||
     settings.headmasterSignatureUrl ||
     settings.headmasterBarcodeUrl;
+
+  const tteSize = 7.0; // Ukuran kotak 1:1 presisi (7mm x 7mm)
+  const tteX = qrBoxX - 1.5 - tteSize;
+  const tteY = signDividerY + 1.2;
 
   let drewSignature = false;
   if (
@@ -560,7 +623,8 @@ export const drawCR80CardPDF = (
   ) {
     try {
       const fmt = headmasterSignImg.includes('image/jpeg') ? 'JPEG' : 'PNG';
-      doc.addImage(headmasterSignImg, fmt, tableX, signY + 3.2, 16.0, 4.4);
+      // Gambar dengan rasio 1:1 bujur sangkar (square) agar QR/Barcode TTE tetap tajam & utuh
+      doc.addImage(headmasterSignImg, fmt, tteX, tteY, tteSize, tteSize);
       drewSignature = true;
     } catch {
       drewSignature = false;
@@ -571,81 +635,38 @@ export const drawCR80CardPDF = (
     try {
       doc.setDrawColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
       doc.setFillColor(248, 250, 252);
-      doc.setLineWidth(0.18);
-      doc.roundedRect(tableX, signY + 3.2, 16.0, 4.4, 0.5, 0.5, 'FD');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(2.2);
-      doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
-      doc.text('TTE ELEKTRONIK', tableX + 8.0, signY + 5.5, { align: 'center' });
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(1.8);
-      doc.setTextColor(100, 116, 139);
-      doc.text('TERVERIFIKASI', tableX + 8.0, signY + 6.9, { align: 'center' });
+      doc.setLineWidth(0.2);
+      doc.roundedRect(tteX, tteY, tteSize, tteSize, 0.5, 0.5, 'FD');
     } catch {
       // fallback
     }
   }
 
-  // Nama & NIP
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(3.0);
-  doc.setTextColor(15, 23, 42);
-  doc.text(headmaster, tableX, signY + 8.6);
-  // Underline
-  const nameWidth = Math.min(doc.getTextWidth(headmaster), 28);
-  doc.setDrawColor(15, 23, 42);
-  doc.setLineWidth(0.18);
-  doc.line(tableX, signY + 8.9, tableX + nameWidth, signY + 8.9);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(2.5);
-  doc.setTextColor(71, 85, 105);
-  doc.text(headmasterNip, tableX, signY + 11.2, { maxWidth: 30 });
-
-  // 6. COLUMN 3 (RIGHT): LARGE SCANNABLE QR CODE & SCAN BADGE (25.5 x 25.5 mm)
-  const qrSize = 25.0; // Large size for instantaneous scanning
-  const qrX = x + cardWidth - qrSize - 3.5;
-  const qrY = photoY - 0.5;
-
-  doc.setFillColor(255, 255, 255);
-  doc.setDrawColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
-  doc.setLineWidth(0.35);
-  doc.roundedRect(qrX - 0.8, qrY - 0.8, qrSize + 1.6, qrSize + 1.6, 1.2, 1.2, 'FD');
-
-  if (qrDataUrl) {
-    try {
-      doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-    } catch {
-      doc.rect(qrX, qrY, qrSize, qrSize);
-    }
-  }
-
-  // Badge PINDAI ABSENSI di Bawah QR Code
-  doc.setFillColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
-  doc.roundedRect(qrX - 0.8, qrY + qrSize + 1.6, qrSize + 1.6, 4.2, 0.8, 0.8, 'F');
-
+  // Label "TTE RESMI" persis di bawah Barcode TTE (seperti pada preview)
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(3.2);
-  doc.setTextColor(255, 255, 255);
-  doc.text('PINDAI ABSENSI', qrX + qrSize / 2, qrY + qrSize + 4.2, { align: 'center' });
+  doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+  doc.text('TTE RESMI', tteX + tteSize / 2, tteY + tteSize + 1.6, { align: 'center' });
 
   // 7. FOOTER RESMI (VALIDITY & KETENTUAN)
-  const footerY = y + cardHeight - 4.5;
+  const footerY = y + cardHeight - 4.2;
+  const footerH = 3.2;
   doc.setDrawColor(226, 232, 240);
   doc.setLineWidth(0.2);
-  doc.line(x + 3, footerY - 0.5, x + cardWidth - 3, footerY - 0.5);
+  doc.line(x + 2.5, footerY - 0.5, x + cardWidth - 2.5, footerY - 0.5);
 
   doc.setFillColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
-  doc.roundedRect(x + 2.5, footerY, cardWidth - 5, 3.4, 0.6, 0.6, 'F');
+  doc.roundedRect(x + 2.5, footerY, cardWidth - 5, footerH, 0.6, 0.6, 'F');
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(2.4);
+  doc.setFontSize(3.8);
   doc.setTextColor(255, 255, 255);
-  doc.text('Kartu resmi presensi digital SDN Kecil Ogomojolo. Wajib dibawa setiap hari sekolah.', x + 4.0, footerY + 2.3);
+  doc.text('Kartu resmi presensi digital SDN Kecil Ogomojolo. Wajib dibawa setiap hari sekolah.', x + 4.0, footerY + 2.1);
 
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(3.8);
   doc.setTextColor(accentRGB[0], accentRGB[1], accentRGB[2]);
-  doc.text(validityText, x + cardWidth - 4.0, footerY + 2.3, { align: 'right' });
+  doc.text(validityText, x + cardWidth - 4.0, footerY + 2.1, { align: 'right' });
 
   // Outer Crisp Stroke
   doc.setDrawColor(203, 213, 225);

@@ -43,6 +43,7 @@ import {
   deleteStudentFromFirestore,
   bulkDeleteStudentsFromFirestore,
   syncAllStudentsToFirestore,
+  replaceFirestoreStudents,
   saveAttendanceToFirestore,
   deleteAttendanceFromFirestore,
   saveTeacherToFirestore,
@@ -901,7 +902,7 @@ export default function App() {
     addToast('Reset Berhasil', 'Data berhasil dikembalikan ke sampel data awal SD.', 'info');
   };
 
-  // Restore Data Handler for Cloud Sync / JSON File Import
+  // Restore Data Handler for Cloud Sync / JSON File Import (Clean Replace, avoids merging with previous school)
   const handleRestoreData = (restored: {
     students: Student[];
     attendanceRecords: AttendanceRecord[];
@@ -910,7 +911,8 @@ export default function App() {
   }) => {
     if (restored.students) {
       setStudents(restored.students);
-      syncAllStudentsToFirestore(restored.students).catch((e) => console.warn(e));
+      // Cleanly replace students in Firestore so orphaned students from other schools are purged
+      replaceFirestoreStudents(restored.students).catch((e) => console.warn(e));
     }
     if (restored.attendanceRecords) {
       setAttendanceRecords(restored.attendanceRecords);
@@ -922,6 +924,11 @@ export default function App() {
     if (restored.teachers) {
       setTeachers(restored.teachers);
     }
+    addToast(
+      'Restorasi Database Sukses',
+      `Data berhasil diganti bersih (${restored.students?.length || 0} Siswa). Data sekolah lama telah dibersihkan.`,
+      'success'
+    );
   };
 
   const todayCount = attendanceRecords.filter((r) => r.date === todayStr).length;

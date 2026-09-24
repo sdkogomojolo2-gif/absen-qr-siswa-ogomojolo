@@ -120,6 +120,40 @@ export async function syncAllStudentsToFirestore(students: Student[]): Promise<v
 }
 
 /**
+ * Replaces all students in Firestore with a clean set, deleting orphaned students from previous schools
+ */
+export async function replaceFirestoreStudents(students: Student[]): Promise<void> {
+  const path = COLLECTIONS.STUDENTS;
+  try {
+    const existingSnap = await getDocs(collection(db, path));
+    const newIdSet = new Set(students.map((s) => s.id));
+    const toDelete: string[] = [];
+
+    existingSnap.forEach((docSnap) => {
+      if (!newIdSet.has(docSnap.id)) {
+        toDelete.push(docSnap.id);
+      }
+    });
+
+    if (toDelete.length > 0) {
+      const CHUNK_SIZE = 400;
+      for (let i = 0; i < toDelete.length; i += CHUNK_SIZE) {
+        const chunk = toDelete.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(db);
+        chunk.forEach((id) => {
+          batch.delete(doc(db, path, id));
+        });
+        await batch.commit();
+      }
+    }
+
+    await syncAllStudentsToFirestore(students);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
+
+/**
  * Bulk saves attendance records in safe chunks (max 400 per batch)
  */
 export async function syncAllAttendanceToFirestore(records: AttendanceRecord[]): Promise<void> {
