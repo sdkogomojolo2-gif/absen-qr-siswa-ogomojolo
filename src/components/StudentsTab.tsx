@@ -14,6 +14,7 @@ import { isHomeroomClassMatch, formatClassLabel, findHomeroomTeacher } from '../
 import { compressStudentPhoto } from '../utils/imageCompressor';
 import { ScheduledLeaveModal } from './ScheduledLeaveModal';
 import { StudentBehaviorModal } from './StudentBehaviorModal';
+import { StudentDemographicPrintModal } from './StudentDemographicPrintModal';
 
 interface StudentsTabProps {
   students: Student[];
@@ -119,6 +120,7 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({
   const [isBulkPrintModalOpen, setIsBulkPrintModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isBrandingModalOpen, setIsBrandingModalOpen] = useState(false);
+  const [isDemographicModalOpen, setIsDemographicModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
 
   // Form Fields (includes photo base64 string, NISN, TTL, Address)
@@ -581,6 +583,16 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({
           >
             <i className="fa-solid fa-print text-xs"></i>
             <span>Cetak Kartu A4</span>
+          </button>
+
+          {/* Tombol Cetak Data Siswa Berdasarkan Umur & Agama (Tersedia untuk Admin, Wali Kelas, dan Guru Mapel) */}
+          <button
+            onClick={() => setIsDemographicModalOpen(true)}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer"
+            title="Cetak Data Siswa Berdasarkan Umur & Agama (Permintaan Data Kedinasan / Kemenag / Pengawas Sekolah)"
+          >
+            <i className="fa-solid fa-file-invoice text-xs"></i>
+            <span>Cetak Data Umur & Agama</span>
           </button>
 
           {/* Tombol Pemilih 3 Desain Kartu CR80 Standar */}
@@ -1671,6 +1683,18 @@ export const StudentsTab: React.FC<StudentsTabProps> = ({
             setIsBehaviorModalOpen(false);
             setTargetStudentForModal(null);
           }}
+        />
+      )}
+
+      {/* Modal Cetak Data Siswa Berdasarkan Umur & Agama (Permintaan Data) */}
+      {isDemographicModalOpen && (
+        <StudentDemographicPrintModal
+          students={students}
+          settings={settings}
+          currentTeacher={currentTeacher}
+          teachers={teachers}
+          defaultClass={effectiveClass}
+          onClose={() => setIsDemographicModalOpen(false)}
         />
       )}
     </div>

@@ -9,6 +9,7 @@ import { AutoAbsenteeModal } from './AutoAbsenteeModal';
 import { ScheduledLeaveModal } from './ScheduledLeaveModal';
 import { StudentBehaviorModal } from './StudentBehaviorModal';
 import { EditAttendanceModal } from './EditAttendanceModal';
+import { StudentDemographicPrintModal } from './StudentDemographicPrintModal';
 
 interface DashboardTabProps {
   students: Student[];
@@ -97,6 +98,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
   const [isAutoAbsenteeOpen, setIsAutoAbsenteeOpen] = useState(false);
   const [isScheduledLeaveOpen, setIsScheduledLeaveOpen] = useState(false);
   const [isStudentBehaviorOpen, setIsStudentBehaviorOpen] = useState(false);
+  const [isDemographicModalOpen, setIsDemographicModalOpen] = useState(false);
 
   // Manual Attendance Form State
   const [manualStudentId, setManualStudentId] = useState('');
@@ -805,6 +807,15 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
             >
               <i className="fa-solid fa-print"></i>
               <span>Cetak / Print</span>
+            </button>
+
+            <button
+              onClick={() => setIsDemographicModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer"
+              title="Cetak Data Siswa Berdasarkan Umur & Agama (Permintaan Data Kedinasan / Kemenag / Sekolah)"
+            >
+              <i className="fa-solid fa-file-invoice"></i>
+              <span>Cetak Data Umur & Agama</span>
             </button>
           </div>
         </div>
@@ -2132,6 +2143,18 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
             setEditingRecord(null);
           }}
           onClose={() => setEditingRecord(null)}
+        />
+      )}
+
+      {/* 5. Modal Cetak Data Siswa Berdasarkan Umur & Agama (Permintaan Data) */}
+      {isDemographicModalOpen && (
+        <StudentDemographicPrintModal
+          students={students}
+          settings={settings}
+          currentTeacher={currentTeacher}
+          teachers={teachers}
+          defaultClass={isWaliKelas && myHomeroom ? myHomeroom : selectedClass !== 'Semua' ? selectedClass : 'Semua'}
+          onClose={() => setIsDemographicModalOpen(false)}
         />
       )}
     </div>
