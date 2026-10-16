@@ -11,7 +11,10 @@ export function cleanStaleLocalStorage(): void {
         // Remove legacy migration keys or excess backup cache keys
         if (
           key.startsWith('absensi_cloud_sync_backup_') ||
-          key.includes('_v1') ||
+          key === 'absensi_siswa_students_v1' ||
+          key === 'absensi_siswa_attendance_v1' ||
+          key === 'absensi_siswa_teachers_v1' ||
+          key === 'absensi_siswa_current_teacher_v1' ||
           key.startsWith('temp_') ||
           key.startsWith('cache_')
         ) {

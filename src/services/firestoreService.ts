@@ -8,7 +8,7 @@ import {
   getDocs,
   writeBatch,
 } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../firebase';
+import { db, getActiveDb, handleFirestoreError, OperationType } from '../firebase';
 import { Student, AttendanceRecord, SystemSettings, Teacher, ScheduledLeave, BehaviorLog } from '../types';
 import { CloudSyncPayload } from '../utils/cloudSync';
 
@@ -545,4 +545,85 @@ export async function seedInitialFirestoreDataIfEmpty(
     console.warn('Could not check or seed Firestore (running in offline/local fallback mode):', error);
   }
 }
+
+/**
+ * Fully synchronizes all current local school datasets to the active Firestore database.
+ * Ideal for when a customer switches to their own BYO Firebase database.
+ */
+export async function syncAllCurrentDataToCustomFirestore(data: {
+  students: Student[];
+  teachers: Teacher[];
+  settings: SystemSettings;
+  attendanceRecords: AttendanceRecord[];
+  leaves?: ScheduledLeave[];
+  behaviorLogs?: BehaviorLog[];
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const currentDb = getActiveDb();
+
+    // 1. Settings
+    if (data.settings) {
+      await setDoc(doc(currentDb, COLLECTIONS.SETTINGS, 'school'), sanitizeForFirestore(data.settings));
+    }
+
+    // 2. Teachers
+    if (data.teachers && data.teachers.length > 0) {
+      const batchT = writeBatch(currentDb);
+      data.teachers.forEach((t) => {
+        batchT.set(doc(currentDb, COLLECTIONS.TEACHERS, t.id), sanitizeForFirestore(t));
+      });
+      await batchT.commit();
+    }
+
+    // 3. Students (in chunks of 400)
+    if (data.students && data.students.length > 0) {
+      const CHUNK_SIZE = 400;
+      for (let i = 0; i < data.students.length; i += CHUNK_SIZE) {
+        const chunk = data.students.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(currentDb);
+        chunk.forEach((std) => {
+          batch.set(doc(currentDb, COLLECTIONS.STUDENTS, std.id), sanitizeForFirestore(std));
+        });
+        await batch.commit();
+      }
+    }
+
+    // 4. Attendance Records (in chunks of 400)
+    if (data.attendanceRecords && data.attendanceRecords.length > 0) {
+      const CHUNK_SIZE = 400;
+      for (let i = 0; i < data.attendanceRecords.length; i += CHUNK_SIZE) {
+        const chunk = data.attendanceRecords.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(currentDb);
+        chunk.forEach((att) => {
+          batch.set(doc(currentDb, COLLECTIONS.ATTENDANCE, att.id), sanitizeForFirestore(att));
+        });
+        await batch.commit();
+      }
+    }
+
+    // 5. Leaves
+    if (data.leaves && data.leaves.length > 0) {
+      const batchL = writeBatch(currentDb);
+      data.leaves.forEach((l) => {
+        batchL.set(doc(currentDb, COLLECTIONS.LEAVES, l.id), sanitizeForFirestore(l));
+      });
+      await batchL.commit();
+    }
+
+    // 6. Behavior logs
+    if (data.behaviorLogs && data.behaviorLogs.length > 0) {
+      const batchB = writeBatch(currentDb);
+      data.behaviorLogs.forEach((b) => {
+        batchB.set(doc(currentDb, COLLECTIONS.BEHAVIOR_LOGS, b.id), sanitizeForFirestore(b));
+      });
+      await batchB.commit();
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('Failed to sync all data to custom Firestore:', err);
+    return { success: false, error: err?.message || String(err) };
+  }
+}
+
 

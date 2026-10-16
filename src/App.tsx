@@ -31,7 +31,12 @@ import { CloudSyncModal } from './components/CloudSyncModal';
 import { DapodikAnnouncementModal, CURRENT_ANNOUNCEMENT_VERSION } from './components/DapodikAnnouncementModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { OfflineIndicator } from './components/OfflineIndicator';
-import { testFirestoreConnection } from './firebase';
+import {
+  testFirestoreConnection,
+  isUsingCustomFirebase,
+  getActiveFirebaseProject,
+  onFirebaseChange,
+} from './firebase';
 import {
   subscribeToStudents,
   subscribeToAttendance,
@@ -248,6 +253,21 @@ export default function App() {
     setIsDarkMode((prev) => !prev);
   };
 
+  // Custom BYO Firebase Cloud state & live project indicator
+  const [isCustomCloud, setIsCustomCloud] = useState<boolean>(() => isUsingCustomFirebase());
+  const [cloudProjectName, setCloudProjectName] = useState<string>(() => getActiveFirebaseProject().projectId);
+  const [firebaseInstanceId, setFirebaseInstanceId] = useState<number>(0);
+
+  // Subscribe to dynamic Firebase app swaps (e.g. user toggles custom BYO database or resets to default)
+  useEffect(() => {
+    const unsub = onFirebaseChange((_newDb, isCustom) => {
+      setIsCustomCloud(isCustom);
+      setCloudProjectName(getActiveFirebaseProject().projectId);
+      setFirebaseInstanceId((prev) => prev + 1);
+    });
+    return () => unsub();
+  }, []);
+
   // Navigation & Date
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
@@ -402,7 +422,7 @@ export default function App() {
       unsubLeaves();
       unsubBehavior();
     };
-  }, [todayStr]);
+  }, [todayStr, firebaseInstanceId]);
 
   // Update Settings in State and Firestore
   const handleUpdateSettings = useCallback(
@@ -955,11 +975,14 @@ export default function App() {
 
         {/* Right Column: Header (Date & Dark/Light mode only) and Main Content */}
         <div className="flex-1 flex flex-col min-w-0 min-h-screen">
-          {/* Top Header - ONLY Date/Time and Dark/Light Mode toggle as requested */}
+          {/* Top Header with Date/Time, Theme Toggle, and Cloud Sync Indicator */}
           <Header
             isDarkMode={isDarkMode}
             onToggleDarkMode={handleToggleDarkMode}
             onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
+            isCustomCloud={isCustomCloud}
+            cloudProjectName={cloudProjectName}
+            onOpenCloudSettings={() => setActiveTab('simulator')}
           />
 
           {/* Toast Notifications */}
@@ -1039,6 +1062,9 @@ export default function App() {
                 students={students}
                 attendanceRecords={attendanceRecords}
                 settings={settings}
+                teachers={teachers}
+                scheduledLeaves={scheduledLeaves}
+                behaviorLogs={behaviorLogs}
                 currentTeacher={currentTeacher}
                 isDarkMode={isDarkMode}
                 onToggleDarkMode={handleToggleDarkMode}
@@ -1047,6 +1073,11 @@ export default function App() {
                 onResetData={handleResetData}
                 onOpenAnnouncement={handleOpenAnnouncement}
                 onResetAnnouncementStatus={handleResetAnnouncementStatus}
+                onNotify={addToast}
+                onFirebaseUpdated={(isCustom, projectId) => {
+                  setIsCustomCloud(isCustom);
+                  setCloudProjectName(projectId);
+                }}
               />
             </ErrorBoundary>
           )}

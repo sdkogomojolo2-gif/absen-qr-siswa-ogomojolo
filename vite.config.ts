@@ -15,9 +15,9 @@ export default defineConfig(() => {
         includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon.svg'],
         manifest: {
           id: '/',
-          name: 'Remix ABSENSI OGOMOJOLO',
-          short_name: 'Absensi Ogo',
-          description: 'Sistem Absensi Pintar QR Code SDN Kecil Ogomojolo',
+          name: 'ABSENSI SISWA',
+          short_name: 'Absensi Siswa',
+          description: 'Sistem Absensi Pintar Siswa QR Code',
           theme_color: '#4a070e',
           background_color: '#4a070e',
           display: 'standalone',

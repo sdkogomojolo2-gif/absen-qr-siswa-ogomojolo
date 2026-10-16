@@ -1,15 +1,19 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Student, AttendanceRecord, SystemSettings, Teacher } from '../types';
+import { Student, AttendanceRecord, SystemSettings, Teacher, ScheduledLeave, BehaviorLog } from '../types';
 import { SD_CLASSES } from '../data/initialData';
 import { formatClassLabel } from '../utils/classUtils';
 import { HeadmasterBarcode } from '../utils/headmasterBarcode';
 import { CardBrandingModal } from './CardBrandingModal';
 import { PWAInstallButton } from './PWAInstallButton';
+import { CustomFirebaseSettingsCard } from './CustomFirebaseSettingsCard';
 
 interface SimulatorTabProps {
   students: Student[];
   attendanceRecords: AttendanceRecord[];
   settings: SystemSettings;
+  teachers?: Teacher[];
+  scheduledLeaves?: ScheduledLeave[];
+  behaviorLogs?: BehaviorLog[];
   currentTeacher?: Teacher | null;
   isDarkMode?: boolean;
   onToggleDarkMode?: () => void;
@@ -21,12 +25,17 @@ interface SimulatorTabProps {
   onResetData: () => void;
   onOpenAnnouncement?: () => void;
   onResetAnnouncementStatus?: () => void;
+  onNotify?: (title: string, message: string, type: 'success' | 'warning' | 'error' | 'info') => void;
+  onFirebaseUpdated?: (isCustom: boolean, projectId: string) => void;
 }
 
 export const SimulatorTab: React.FC<SimulatorTabProps> = ({
   students,
   attendanceRecords,
   settings,
+  teachers = [],
+  scheduledLeaves = [],
+  behaviorLogs = [],
   currentTeacher,
   isDarkMode = false,
   onToggleDarkMode,
@@ -35,6 +44,8 @@ export const SimulatorTab: React.FC<SimulatorTabProps> = ({
   onResetData,
   onOpenAnnouncement,
   onResetAnnouncementStatus,
+  onNotify,
+  onFirebaseUpdated,
 }) => {
   const isAdmin = currentTeacher?.role === 'admin';
   const [cutoffTime, setCutoffTime] = useState(settings.lateCutoffTime);
@@ -108,6 +119,18 @@ export const SimulatorTab: React.FC<SimulatorTabProps> = ({
 
       {/* PWA Install Banner */}
       <PWAInstallButton variant="banner" />
+
+      {/* Database Cloud Pribadi (Firebase BYO Database) Section */}
+      <CustomFirebaseSettingsCard
+        students={students}
+        teachers={teachers}
+        settings={settings}
+        attendanceRecords={attendanceRecords}
+        scheduledLeaves={scheduledLeaves}
+        behaviorLogs={behaviorLogs}
+        onNotify={onNotify}
+        onFirebaseUpdated={onFirebaseUpdated}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Quick Scan Simulator (2 Cols) */}

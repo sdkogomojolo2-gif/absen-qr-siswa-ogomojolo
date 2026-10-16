@@ -5,12 +5,18 @@ interface HeaderProps {
   isDarkMode?: boolean;
   onToggleDarkMode?: () => void;
   onToggleMobileSidebar?: () => void;
+  isCustomCloud?: boolean;
+  cloudProjectName?: string;
+  onOpenCloudSettings?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   isDarkMode = false,
   onToggleDarkMode,
   onToggleMobileSidebar,
+  isCustomCloud = false,
+  cloudProjectName = '',
+  onOpenCloudSettings,
 }) => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
@@ -61,9 +67,44 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Right: PWA Install Button & Dark/Light Mode Toggle */}
-        <div className="flex items-center gap-2">
+        {/* Right: Cloud Sync Status Indicator, PWA Install Button & Theme Toggle */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Status Sinkronisasi: Hijau (Cloud Pribadi) vs Abu-abu (Mode Offline/Lokal) */}
+          {isCustomCloud ? (
+            <button
+              type="button"
+              onClick={onOpenCloudSettings}
+              className="group flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/60 text-emerald-300 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+              title={`Terhubung ke Cloud Firebase Pribadi (${cloudProjectName || 'Aktif'}). Klik untuk melihat pengaturan.`}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <i className="fa-solid fa-cloud text-emerald-400 text-[11px]"></i>
+              <span className="hidden sm:inline font-medium">Cloud Pribadi:</span>
+              <span className="font-mono text-white text-[11px] max-w-[110px] truncate group-hover:text-emerald-200">
+                {cloudProjectName || 'Terhubung'}
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onOpenCloudSettings}
+              className="group flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600/60 text-slate-300 text-xs font-semibold transition-all shadow-2xs cursor-pointer"
+              title="Aplikasi berjalan dalam Mode Offline/Lokal. Klik untuk mengatur Database Cloud Firebase Pribadi Anda."
+            >
+              <span className="h-2 w-2 rounded-full bg-slate-400"></span>
+              <i className="fa-solid fa-cloud-arrow-down text-slate-400 text-[11px]"></i>
+              <span className="hidden sm:inline font-normal text-slate-300">Mode:</span>
+              <span className="text-slate-200 text-[11px] group-hover:text-white">
+                Offline / Lokal
+              </span>
+            </button>
+          )}
+
           <PWAInstallButton variant="compact" />
+
           {onToggleDarkMode && (
             <button
               type="button"
